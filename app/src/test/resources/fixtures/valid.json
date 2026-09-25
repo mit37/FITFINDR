@@ -1,0 +1,21 @@
+{
+  "styleLabel": "smart casual",
+  "garments": [
+    {
+      "type": "jacket",
+      "color": "olive green",
+      "material": "cotton twill",
+      "fit": "relaxed",
+      "searchQueries": ["olive green cotton twill jacket relaxed fit"]
+    },
+    {
+      "type": "trousers",
+      "color": "charcoal",
+      "material": "wool blend",
+      "fit": "tapered",
+      "searchQueries": ["charcoal wool blend tapered trousers"]
+    }
+  ],
+  "palette": ["#5B6B3B", "#2B2B2B", "#EDE6D6"],
+  "notes": "confident on all fields"
+}

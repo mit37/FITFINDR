@@ -1,0 +1,18 @@
+Sure, here is the description:
+```json
+{
+  "styleLabel": "business formal",
+  "garments": [
+    {
+      "type": "blazer",
+      "color": "navy",
+      "material": "wool",
+      "fit": "fitted",
+      "searchQueries": ["navy wool fitted blazer"]
+    }
+  ],
+  "palette": ["#1B2A4A", "#F5F5F5"],
+  "notes": "wrapped in a markdown code fence"
+}
+```
+Let me know if you need anything else.

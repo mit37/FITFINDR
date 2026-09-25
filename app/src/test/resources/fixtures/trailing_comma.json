@@ -1,0 +1,14 @@
+{
+  "styleLabel": "streetwear",
+  "garments": [
+    {
+      "type": "hoodie",
+      "color": "black",
+      "material": "fleece",
+      "fit": "oversized",
+      "searchQueries": ["black fleece oversized hoodie"],
+    },
+  ],
+  "palette": ["#111111", "#EEEEEE"],
+  "notes": "has trailing commas",
+}

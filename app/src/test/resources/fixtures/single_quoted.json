@@ -1,0 +1,14 @@
+{
+  'styleLabel': 'streetwear',
+  'garments': [
+    {
+      'type': 'sneakers',
+      'color': 'white',
+      'material': 'leather',
+      'fit': 'true to size',
+      'searchQueries': ['white leather sneakers']
+    }
+  ],
+  'palette': ['#FFFFFF', '#222222'],
+  'notes': 'entirely single-quoted'
+}
