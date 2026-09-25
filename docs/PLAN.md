@@ -12,9 +12,10 @@ below.
 - [ ] Capture → on-device inference → structured result works end-to-end on
       a real device with the real `MediaPipeVlmEngine`.
 - [x] `ResultParser` and `ColorExtractor` have extensive, real, passing
-      JUnit5 unit tests with golden fixtures. *(see Milestone 3 below —
-      written and verified standalone this session; not yet verified through
-      the Android Gradle Plugin test task, see "Cloud-instance constraints")*
+      JUnit5 unit tests with golden fixtures. *(19 tests, all passing —
+      verified standalone this session against a plain Kotlin/JVM project
+      built from the same source files; not yet verified through
+      `./gradlew test` on `:app` itself, see "Cloud-instance constraints")*
 - [ ] Model download is resumable, checksum-verified, and deletable from
       Settings.
 - [ ] Settings screen shows the active inference accelerator (CPU/GPU/NPU)
@@ -83,20 +84,68 @@ the part that could be verified without Android was actually verified.
 
 ### What was actually verified this session, and how
 
-The Android Gradle Plugin itself requires the Android SDK to configure a
-build (even to run a plain `./gradlew test` on `:app`), and this container
-has no SDK (`which sdkmanager adb` → nothing found; `$ANDROID_HOME` and
-`$ANDROID_SDK_ROOT` are both unset). So `./gradlew test` was **not** runnable
-here and its output cannot be honestly reported.
+The Android Gradle Plugin itself requires resolving `com.android.application`
+from Google's Maven repo to even configure `:app`. In this container that
+repo is unreachable: `curl https://dl.google.com/...` returns
+`CONNECT tunnel failed, response 403` through the sandboxed proxy (Maven
+Central, by contrast, is reachable: `curl https://repo.maven.apache.org/`
+returns `200`). Concretely, `./gradlew help` in this repo fails with:
 
-To get real verification anyway, the core logic of `ResultParser` and
-`ColorExtractor` (which have zero Android dependencies) was copied into a
-standalone Kotlin script/module and compiled and executed directly with
-`kotlinc`/`kotlin` outside Gradle, exercising the same algorithms against
-the same fixture data. See the session report for exact commands and their
-real output. This is real verification of the *logic*, but it is not the
-same as a green `./gradlew test` run through the Android Gradle Plugin — that
-remains unverified locally and is expected to run in CI.
+```
+Plugin [id: 'com.android.application', version: '8.6.1', apply: false] was not found in any of the following sources:
+...
+  could not resolve plugin artifact 'com.android.application:com.android.application.gradle.plugin:8.6.1'
+```
+
+So `./gradlew test`, `./gradlew ktlintCheck`, `./gradlew detekt`, and
+`./gradlew assembleDebug` on the real `:app` module were **not** runnable
+here and their output cannot be honestly reported as passing. This is a
+different (network) constraint than "no SDK/emulator," but has the same
+practical effect in this container.
+
+To get real verification anyway, `ResultParser.kt`, `ColorExtractor.kt`,
+`OutfitResult.kt`, and the two test files (`ResultParserTest.kt`,
+`ColorExtractorTest.kt`) plus their fixtures — all pure Kotlin/JVM, zero
+Android imports (confirmed by inspection: no `android.*` import in any of
+the three domain files) — were copied verbatim into a standalone
+`kotlin("jvm")` + `kotlin("plugin.serialization")` Gradle project (built
+against Maven Central only, which is reachable) and run for real:
+
+```
+$ /opt/gradle/bin/gradle test --console=plain
+...
+ColorExtractorTest > two well-separated clusters of equal size are found with roughly equal share PASSED
+ColorExtractorTest > extraction is deterministic for a fixed seed across repeated runs PASSED
+ColorExtractorTest > empty input returns an empty list PASSED
+ColorExtractorTest > toHex formats a packed RGB int as an uppercase hex string PASSED
+ColorExtractorTest > three well-separated clusters are all recovered PASSED
+ColorExtractorTest > a single pixel input returns one cluster with 100% share PASSED
+ColorExtractorTest > requesting more clusters than distinct colors never invents empty clusters PASSED
+ColorExtractorTest > an unbalanced two-cluster input reports the majority cluster first, by share PASSED
+ColorExtractorTest > a single repeated color returns exactly one cluster covering 100% of pixels PASSED
+ColorExtractorTest > k must be positive PASSED
+ResultParserTest > an empty string fails to parse PASSED
+ResultParserTest > markdown code fences and surrounding prose are stripped and repaired PASSED
+ResultParserTest > missing or blank fields default to the literal string 'unknown' PASSED
+ResultParserTest > single-quoted JSON is repaired to double-quoted and parsed PASSED
+ResultParserTest > valid JSON parses on the strict (first) attempt PASSED
+ResultParserTest > unknown extra keys in the model output are ignored, not fatal PASSED
+ResultParserTest > garments and palette default to empty lists when absent, not unknown PASSED
+ResultParserTest > trailing commas are repaired and parsed PASSED
+ResultParserTest > text with no JSON object at all fails to parse, even after repair PASSED
+
+BUILD SUCCESSFUL in 2s
+```
+
+All 19 tests, exercising the exact source files that live under
+`app/src/main/java/.../domain/` and `app/src/test/java/.../domain/` in this
+repo, passed. This is real verification of the *logic* those files contain.
+It is **not** the same as a green `./gradlew test` run through the Android
+Gradle Plugin on `:app` itself (which also runs ktlint/detekt static
+analysis over these files, applies the app module's Kotlin compiler
+options, and would catch e.g. an Android-side wiring mistake) — that
+remains unverified locally in this session and is expected to run in CI,
+where both the Android SDK and Google's Maven repo should be reachable.
 
 ## Deferred to future sessions (Milestones 4–8) — NOT started
 
@@ -120,11 +169,19 @@ remains unverified locally and is expected to run in CI.
 - `$ANDROID_HOME` → empty.
 - `$ANDROID_SDK_ROOT` → empty.
 - No emulator, no physical device, no NPU/GPU delegate available.
-- Conclusion: nothing that requires the Android Gradle Plugin's SDK-aware
-  tasks (`assembleDebug`, instrumented tests, Robolectric tests that need
-  the Android jar) could be run in this session. GitHub Actions CI is
-  expected to have the SDK and should be able to run these — that is noted
-  as an expectation to confirm, not a claim of success.
+- `curl https://dl.google.com/...` → `CONNECT tunnel failed, response 403`
+  through this container's sandboxed network proxy — Google's Maven repo,
+  which the Android Gradle Plugin itself needs to resolve, is not reachable
+  here. (Maven Central *is* reachable: `curl https://repo.maven.apache.org/`
+  → `200`.) So even `./gradlew help` fails in this repo, before any
+  Android-specific task runs — see "What was actually verified this
+  session" under Milestone 3 for the exact failure and the workaround used.
+- Conclusion: nothing that requires the Android Gradle Plugin (`assembleDebug`,
+  `ktlintCheck`, `detekt`, `./gradlew test` on `:app`, instrumented tests,
+  Robolectric tests) could be run in this session. GitHub Actions CI is
+  expected to have both the SDK and reachable Google/Maven repos and should
+  be able to run these — that is noted as an expectation to confirm, not a
+  claim of success.
 
 ## GitHub repo settings to apply manually (cannot be done via git)
 
