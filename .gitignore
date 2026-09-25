@@ -1,0 +1,47 @@
+# Secrets — never commit
+.env
+.env.*
+*.key
+*.pem
+secrets/
+
+# Model weights / datasets — never commit
+*.gguf
+*.safetensors
+*.bin
+*.onnx
+*.tflite
+*.task
+
+# Android / Gradle build artifacts
+*.iml
+.gradle/
+build/
+/captures
+.externalNativeBuild/
+.cxx/
+local.properties
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Keystores
+*.jks
+*.keystore
+
+# IDE
+.idea/
+*.hprof
+.navigation/
+captures/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Kotlin/Java scratch
+*.class
+out/
+
+# Gradle wrapper jar is tracked; do not ignore gradle-wrapper.jar
