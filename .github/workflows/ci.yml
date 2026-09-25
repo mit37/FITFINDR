@@ -34,11 +34,15 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      # GitHub-hosted Ubuntu runners ship with the Android SDK preinstalled;
-      # this action makes sure the specific platform/build-tools we need are
-      # present without requiring a local SDK in this repo.
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      # GitHub-hosted Ubuntu runners ship with the Android SDK preinstalled
+      # (ANDROID_HOME set, licenses pre-accepted, cmdline-tools available).
+      # AGP downloads any additional platform/build-tools version it needs
+      # via that preinstalled sdkmanager during the Gradle build itself, so
+      # no separate setup action is required. (We previously used
+      # android-actions/setup-android@v3 here, but it fails outright: by
+      # default it runs `sdkmanager tools`, and Google removed the legacy
+      # "tools" package from the SDK repository, so the step always exits 1
+      # before any real check runs.)
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
