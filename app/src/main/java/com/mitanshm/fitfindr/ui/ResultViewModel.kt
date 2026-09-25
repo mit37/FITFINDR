@@ -2,6 +2,7 @@ package com.mitanshm.fitfindr.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mitanshm.fitfindr.data.db.OutfitRepository
 import com.mitanshm.fitfindr.domain.DescribeOutfitUseCase
 import com.mitanshm.fitfindr.domain.OutfitResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +25,7 @@ class ResultViewModel
     @Inject
     constructor(
         private val describeOutfit: DescribeOutfitUseCase,
+        private val outfitRepository: OutfitRepository,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow<ResultUiState>(ResultUiState.Loading)
         val uiState: StateFlow<ResultUiState> = _uiState.asStateFlow()
@@ -42,7 +44,12 @@ class ResultViewModel
                 val result = describeOutfit(ByteArray(0))
                 _uiState.value =
                     result.fold(
-                        onSuccess = { ResultUiState.Success(it) },
+                        onSuccess = { outfit ->
+                            // Persist every successful describe to history. Failures are
+                            // intentionally not saved -- there is nothing structured to show later.
+                            outfitRepository.save(outfit)
+                            ResultUiState.Success(outfit)
+                        },
                         onFailure = { ResultUiState.Error(it.message ?: "Unknown error") },
                     )
             }

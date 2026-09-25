@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mitanshm.fitfindr.domain.Garment
@@ -34,6 +35,7 @@ fun ResultScreen(
     viewModel: ResultViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     Scaffold(
         topBar = { TopAppBar(title = { Text("Your outfit") }) },
@@ -42,7 +44,12 @@ fun ResultScreen(
             when (val s = state) {
                 is ResultUiState.Loading -> Text("Describing outfit on-device…")
                 is ResultUiState.Error -> Text("Could not describe this outfit: ${s.message}")
-                is ResultUiState.Success -> OutfitResultView(s.outfit)
+                is ResultUiState.Success -> {
+                    OutfitResultView(s.outfit)
+                    Button(onClick = { ShareImage.share(context, ShareImage.render(s.outfit)) }) {
+                        Text("Share as image")
+                    }
+                }
             }
             Button(onClick = onDone) { Text("Done") }
         }
