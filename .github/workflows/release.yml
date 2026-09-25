@@ -1,0 +1,71 @@
+name: Release
+
+# Triggered by pushing a tag like v2.0.0. Builds a signed release APK and
+# attaches it to a GitHub Release.
+#
+# HONESTY (see docs/PLAN.md): this workflow is a SKELETON. It has never
+# run -- no tag has been pushed, and the signing secrets it reads
+# (ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS,
+# ANDROID_KEY_PASSWORD) do not exist in this repo's GitHub Secrets. Only
+# Mitansh can add a real signing keystore; an AI coding agent must not
+# fabricate one (STANDARDS.md rule 7, milestone 8's explicit instruction).
+# Do not tag v2.0.0 until: (1) these four secrets are added for real, (2)
+# this workflow has been observed to run green on an actual tag push, and
+# (3) the milestone 5/7 on-device numbers this repo is still missing are
+# filled in -- see docs/PLAN.md's "what's left before v2.0.0" checklist.
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build-and-sign:
+    name: Build, sign, and publish release APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      # Decodes the base64-encoded keystore secret to a file
+      # app/build.gradle.kts's release signingConfig reads via
+      # ANDROID_KEYSTORE_PATH. If ANDROID_KEYSTORE_BASE64 is unset (as it is
+      # today -- see the honesty note above), this produces an empty/invalid
+      # file, app/build.gradle.kts skips configuring a signingConfig at all
+      # (its `if (!releaseKeystorePath.isNullOrBlank())` guard), and
+      # assembleRelease below produces an UNSIGNED APK rather than silently
+      # fabricating a signature -- an unsigned APK cannot be installed on a
+      # real device or accepted by most distribution channels, so this fails
+      # visibly downstream rather than lying about being signed.
+      - name: Decode signing keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > release.keystore
+
+      - name: Build signed release APK
+        env:
+          ANDROID_KEYSTORE_PATH: ${{ github.workspace }}/release.keystore
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Remove keystore file
+        if: always()
+        run: rm -f release.keystore
+
+      - name: Create GitHub Release and upload APK
+        uses: softprops/action-gh-release@v2
+        with:
+          files: app/build/outputs/apk/release/*.apk
+          generate_release_notes: true

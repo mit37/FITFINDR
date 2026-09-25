@@ -5,11 +5,11 @@ FitFindr himself. No agent in this session has run the app on a device or
 recorded anything — this is a script to follow, not a claim that a demo
 exists.
 
-## What can honestly be demoed right now (milestones 1–3)
+## What can honestly be demoed right now (milestones 1–7)
 
 As of this session, the app runs entirely against `FakeVlmEngine` — it does
-not run a real model, and does not have a working camera preview or history
-screen. A demo recorded today would show:
+not run a real model, and does not have a working live camera preview. A
+demo recorded today would show:
 
 1. The app launching to the Capture screen.
 2. Tapping "Pick from gallery" and picking any photo (the Android Photo
@@ -17,14 +17,23 @@ screen. A demo recorded today would show:
    `FakeVlmEngine` ignores it).
 3. Navigating to the Result screen, showing the same fixed fixture outfit
    result every time (style label "smart casual", three garments, a
-   palette).
-4. Tapping into the History and Settings placeholder screens, which each
-   show a one-line "coming in milestone N" message.
+   palette), plus a working "Share as image" button that opens the real
+   Android share sheet with a rendered PNG.
+4. Opening History, showing the outfit that was just saved (real Room
+   persistence now — milestone 6), tapping it to expand, and deleting it.
+5. Opening Settings, showing the real model download UI (start/cancel/
+   delete, progress bar) — tapping "Download model" will fail, honestly,
+   since `ModelConfig.DOWNLOAD_URL` is still a placeholder (no real model
+   is hosted yet, see `docs/PLAN.md`) — and the "Active accelerator" line,
+   which honestly reads "Not applicable — running against FakeVlmEngine"
+   because `MediaPipeVlmEngine` (milestone 5) is not the bound engine yet.
 
-This is a legitimate demo of the navigation/UI skeleton — it is **not** a
-demo of on-device AI inference, and should not be captioned as one. Caption
-it honestly, e.g. "FitFindr v2, early build — UI skeleton against a fake
-inference engine, real on-device model coming in a later milestone."
+This is a legitimate demo of the navigation/UI/persistence/share skeleton
+— it is **not** a demo of on-device AI inference or a real model download,
+and should not be captioned as one. Caption it honestly, e.g. "FitFindr
+v2, early build — UI, history and share-as-image against a fake inference
+engine; real on-device model download/inference verified on a future
+device session."
 
 ## Prerequisites
 
