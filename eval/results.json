@@ -1,0 +1,46 @@
+{
+  "$schema_note": "See eval/README.md for the full explanation. Nothing in this file is an invented number -- every value under harness_self_check was produced by actually running the eval harness's own code in this repo, on this machine, this session. Everything under pending_real_device_numbers is null on purpose: it requires Mitansh's real photos + a real Android device with the real MediaPipeVlmEngine, neither of which exists in this development container.",
+
+  "harness_self_check": {
+    "description": "Runs EvalMetrics + ResultParser + ColorExtractor against FakeVlmEngine's fixed fixture output and the existing golden JSON test fixtures (app/src/test/resources/fixtures/). NOT a measurement of real model accuracy, latency, or memory -- FakeVlmEngine always returns the same canned string instantly. This section exists only to prove the eval harness's own logic runs and is correct, per the honesty rules in STANDARDS.md.",
+    "how_this_was_produced": "app/src/test/java/com/mitanshm/fitfindr/eval/EvalHarnessSelfCheckTest.kt, EvalMetricsTest.kt, and LabelsCsvTest.kt, executed via a standalone Kotlin/JVM Gradle project built from the exact same source files (see docs/PLAN.md for why -- this container cannot resolve the Android Gradle Plugin from Google's Maven repo, so ./gradlew test on :app itself is unverified locally; it is expected to also pass under CI).",
+    "reproduce_with": "./gradlew test --tests \"com.mitanshm.fitfindr.eval.*\" (on a machine that can resolve the Android Gradle Plugin), or see docs/PLAN.md for the standalone-JVM equivalent used in this session.",
+    "json_validity": {
+      "total_cases": 6,
+      "strict_valid_count": 2,
+      "strict_valid_rate": 0.3333333333333333,
+      "valid_after_repair_count": 5,
+      "valid_after_repair_rate": 0.8333333333333334,
+      "note": "Against the 6 existing golden fixtures (valid, trailing_comma, markdown_fenced, single_quoted, missing_fields, unrecoverable). valid.json and missing_fields.json are strictly valid JSON on the first try; unrecoverable.txt is designed to never parse."
+    },
+    "garment_type_score_on_fixture_self_match": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "note": "FakeVlmEngine's fixture garment types (jacket, trousers, shoes) compared against themselves -- a self-consistency check, not an accuracy measurement."
+    },
+    "end_to_end_latency_self_check": {
+      "average_ms_per_describe_and_parse_call": 0.32,
+      "iterations": 200,
+      "measured_on": "this session's cloud container, JVM, not a phone",
+      "note": "FakeVlmEngine.describe() returns a hardcoded string with no I/O or inference, so this measures string-return + JSON-parse overhead only, not real model latency. Run-to-run values vary with JIT warmup; ~0.3ms/call is representative of what was observed this session."
+    },
+    "unit_test_pass_count": {
+      "total_tests": 59,
+      "failures": 0,
+      "note": "All Kotlin/JVM-portable unit tests in this repo as of this session (ResultParser: 9, ColorExtractor: 10, ChecksumVerifier: 6, StoragePrecheck: 7, DownloadPlanner: 6, OutfitMapper: 4, LabelsCsv: 4, EvalMetrics: 9, EvalHarnessSelfCheck: 4), run via the standalone JVM verification project described in docs/PLAN.md. This count does NOT include ktlint/detekt static analysis or any Android-instrumented test, which require the Android Gradle Plugin and were not runnable in this container."
+    }
+  },
+
+  "pending_real_device_numbers": {
+    "description": "Requires: (1) ~100 real labeled photos in eval/photos/ + eval/labels.csv (Mitansh's own, per PRD.md and eval/README.md -- none exist yet), (2) a real Android device or emulator with the Android SDK, (3) MediaPipeVlmEngine actually loading and running Gemma 3n E4B. None of these exist in this development container. Every field below is null, not a placeholder guess.",
+    "garment_type_precision": null,
+    "garment_type_recall": null,
+    "color_accuracy_model_only": null,
+    "color_accuracy_with_pixel_cross_check": null,
+    "json_validity_rate_pre_repair_real_model": null,
+    "json_validity_rate_post_repair_real_model": null,
+    "latency_ms_by_device_class": {},
+    "peak_ram_bytes_by_device_class": {},
+    "how_to_produce_this": "See eval/README.md's 'Two ways this harness runs' section: push labels.csv + photos to a device, run `./gradlew connectedCheck -Peval`, pull eval_results.json, and merge its numbers in here by hand."
+  }
+}

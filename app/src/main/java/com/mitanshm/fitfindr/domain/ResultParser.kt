@@ -38,6 +38,16 @@ object ResultParser {
         )
     }
 
+    /**
+     * Like [parse] but never attempts the [repair] pass. Used by the eval
+     * harness (`eval/README.md`) to measure how often raw model output is
+     * valid JSON on the first try, separately from the post-repair rate
+     * that [parse] itself reports.
+     */
+    fun parseStrictOnly(rawText: String): Result<OutfitResult> =
+        strictDecode(rawText)?.let { Result.success(it.toDomain()) }
+            ?: Result.failure(ResultParseException("Could not parse model output as OutfitResult JSON (strict, no repair attempted)."))
+
     private fun strictDecode(text: String): OutfitResultDto? =
         try {
             strictJson.decodeFromString(OutfitResultDto.serializer(), text)

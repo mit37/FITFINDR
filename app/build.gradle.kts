@@ -63,6 +63,18 @@ android {
     }
 }
 
+// `./gradlew connectedCheck -Peval` narrows connectedCheck to just the eval
+// harness (see eval/README.md) instead of running every instrumented test.
+// Unexercised in this repo's CI -- there is no connected device there either
+// (see docs/PLAN.md) -- but real, reproducible syntax for whoever has one.
+if (project.hasProperty("eval")) {
+    android {
+        defaultConfig {
+            testInstrumentationRunnerArguments["class"] = "com.mitanshm.fitfindr.eval.EvalHarnessInstrumentedTest"
+        }
+    }
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

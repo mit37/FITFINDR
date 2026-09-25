@@ -13,6 +13,9 @@ secrets/
 *.tflite
 *.task
 
+# Eval photos are Mitansh's own photographs (see eval/README.md); never commit them
+eval/photos/
+
 # Android / Gradle build artifacts
 *.iml
 .gradle/
