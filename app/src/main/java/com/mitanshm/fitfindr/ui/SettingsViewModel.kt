@@ -18,7 +18,8 @@ class SettingsViewModel
         private val modelDownloader: ModelDownloader,
     ) : ViewModel() {
         val downloadState: StateFlow<ModelDownloadState> =
-            modelDownloader.observeDownloadState()
+            modelDownloader
+                .observeDownloadState()
                 .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), ModelDownloadState.NotStarted)
 
         fun isModelReady(): Boolean = modelDownloader.isModelReady()

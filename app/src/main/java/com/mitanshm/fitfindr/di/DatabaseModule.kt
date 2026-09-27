@@ -18,8 +18,7 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(
         @ApplicationContext context: Context,
-    ): FitFindrDatabase =
-        Room.databaseBuilder(context, FitFindrDatabase::class.java, FitFindrDatabase.DATABASE_NAME).build()
+    ): FitFindrDatabase = Room.databaseBuilder(context, FitFindrDatabase::class.java, FitFindrDatabase.DATABASE_NAME).build()
 
     @Provides
     fun provideOutfitDao(database: FitFindrDatabase): OutfitDao = database.outfitDao()

@@ -42,9 +42,16 @@ object DownloadPlanner {
 }
 
 sealed interface DownloadAction {
-    data class StartFresh(val remainingBytes: Long) : DownloadAction
+    data class StartFresh(
+        val remainingBytes: Long,
+    ) : DownloadAction
 
-    data class Resume(val fromByteOffset: Long, val remainingBytes: Long) : DownloadAction
+    data class Resume(
+        val fromByteOffset: Long,
+        val remainingBytes: Long,
+    ) : DownloadAction
 
-    data class RestartFromScratch(val reason: String) : DownloadAction
+    data class RestartFromScratch(
+        val reason: String,
+    ) : DownloadAction
 }

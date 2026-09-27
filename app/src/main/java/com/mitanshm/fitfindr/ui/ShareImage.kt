@@ -34,9 +34,23 @@ object ShareImage {
         val canvas = Canvas(bitmap)
         canvas.drawColor(Color.WHITE)
 
-        val titlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.BLACK; textSize = 52f; isFakeBoldText = true }
-        val bodyPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.DKGRAY; textSize = 34f }
-        val headingPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.BLACK; textSize = 38f; isFakeBoldText = true }
+        val titlePaint =
+            Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.BLACK
+                textSize = 52f
+                isFakeBoldText = true
+            }
+        val bodyPaint =
+            Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.DKGRAY
+                textSize = 34f
+            }
+        val headingPaint =
+            Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.BLACK
+                textSize = 38f
+                isFakeBoldText = true
+            }
 
         var y = 80f
         canvas.drawText("FitFindr", 40f, y, titlePaint)

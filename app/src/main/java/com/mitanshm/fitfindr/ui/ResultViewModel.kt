@@ -15,9 +15,13 @@ import javax.inject.Inject
 sealed interface ResultUiState {
     data object Loading : ResultUiState
 
-    data class Success(val outfit: OutfitResult) : ResultUiState
+    data class Success(
+        val outfit: OutfitResult,
+    ) : ResultUiState
 
-    data class Error(val message: String) : ResultUiState
+    data class Error(
+        val message: String,
+    ) : ResultUiState
 }
 
 @HiltViewModel

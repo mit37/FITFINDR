@@ -1,11 +1,11 @@
 package com.mitanshm.fitfindr.eval
 
+import android.content.Context
 import com.mitanshm.fitfindr.data.inference.VlmEngine
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import android.content.Context
 
 /**
  * Lets [EvalHarnessInstrumentedTest] (a plain instrumented test, not an

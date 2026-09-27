@@ -41,7 +41,11 @@ object EvalMetrics {
         return ParseValidity(rawTexts.size, strictValid, validAfterRepair)
     }
 
-    data class GarmentTypeScore(val precision: Double, val recall: Double, val f1: Double)
+    data class GarmentTypeScore(
+        val precision: Double,
+        val recall: Double,
+        val f1: Double,
+    )
 
     /**
      * Multiset precision/recall of predicted garment-`type` strings against
@@ -82,7 +86,8 @@ object EvalMetrics {
     ): Boolean {
         val normalizedModelName = modelColorName.trim().lowercase()
         return pixelPalette.any { hex ->
-            hexToName[hex.uppercase()]?.lowercase()?.let { name -> name == normalizedModelName || name.contains(normalizedModelName) } == true
+            hexToName[hex.uppercase()]?.lowercase()?.let { name -> name == normalizedModelName || name.contains(normalizedModelName) } ==
+                true
         }
     }
 }

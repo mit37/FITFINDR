@@ -33,7 +33,6 @@ class ModelDownloadWorker
         @Assisted appContext: Context,
         @Assisted workerParams: WorkerParameters,
     ) : CoroutineWorker(appContext, workerParams) {
-
         override suspend fun doWork(): Result {
             val modelFile = File(applicationContext.filesDir, ModelConfig.MODEL_FILE_NAME)
             val partialFile = File(applicationContext.filesDir, ModelConfig.PARTIAL_FILE_NAME)
@@ -112,12 +111,17 @@ class ModelDownloadWorker
         private fun buildProgressData(
             downloadedBytes: Long,
             totalBytes: Long,
-        ) = androidx.work.Data.Builder()
+        ) = androidx.work.Data
+            .Builder()
             .putLong(KEY_DOWNLOADED_BYTES, downloadedBytes)
             .putLong(KEY_TOTAL_BYTES, totalBytes)
             .build()
 
-        private fun buildErrorData(message: String) = androidx.work.Data.Builder().putString(KEY_ERROR, message).build()
+        private fun buildErrorData(message: String) =
+            androidx.work.Data
+                .Builder()
+                .putString(KEY_ERROR, message)
+                .build()
 
         companion object {
             const val KEY_DOWNLOADED_BYTES = "downloadedBytes"

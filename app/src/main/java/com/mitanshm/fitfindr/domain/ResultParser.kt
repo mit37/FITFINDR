@@ -21,10 +21,11 @@ import kotlinx.serialization.json.Json
  * model itself failed to fill a field.
  */
 object ResultParser {
-    private val strictJson = Json {
-        ignoreUnknownKeys = true
-        isLenient = false
-    }
+    private val strictJson =
+        Json {
+            ignoreUnknownKeys = true
+            isLenient = false
+        }
 
     fun parse(rawText: String): Result<OutfitResult> {
         strictDecode(rawText)?.let { return Result.success(it.toDomain()) }
@@ -91,7 +92,9 @@ object ResultParser {
     private fun singleQuotesToDouble(text: String): String = singleQuotedRegex.replace(text) { "\"${it.groupValues[1]}\"" }
 }
 
-class ResultParseException(message: String) : Exception(message)
+class ResultParseException(
+    message: String,
+) : Exception(message)
 
 @Serializable
 internal data class OutfitResultDto(

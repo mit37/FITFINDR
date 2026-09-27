@@ -51,7 +51,6 @@ class MediaPipeVlmEngine
         @ApplicationContext private val context: Context,
         private val modelDownloader: ModelDownloader,
     ) : VlmEngine {
-
         @Volatile
         private var cachedSession: LlmInferenceSession? = null
 
@@ -77,7 +76,11 @@ class MediaPipeVlmEngine
                 // transitively pull in depending on the pinned version -- this
                 // import path is the best documentation-based guess, not a
                 // verified-working one. See this file's class doc.
-                session.addImage(com.google.mediapipe.framework.image.BitmapImageBuilder(bitmap).build())
+                session.addImage(
+                    com.google.mediapipe.framework.image
+                        .BitmapImageBuilder(bitmap)
+                        .build(),
+                )
                 session.generateResponse()
             }
 
@@ -121,7 +124,8 @@ class MediaPipeVlmEngine
             val llmInference =
                 LlmInference.createFromOptions(
                     context,
-                    LlmInference.LlmInferenceOptions.builder()
+                    LlmInference.LlmInferenceOptions
+                        .builder()
                         .setModelPath(modelPath)
                         .setMaxTokens(MAX_TOKENS)
                         .setPreferredBackend(backend)
@@ -129,7 +133,8 @@ class MediaPipeVlmEngine
                 )
             return LlmInferenceSession.createFromOptions(
                 llmInference,
-                LlmInferenceSession.LlmInferenceSessionOptions.builder()
+                LlmInferenceSession.LlmInferenceSessionOptions
+                    .builder()
                     .setTopK(TOP_K)
                     .setTemperature(TEMPERATURE)
                     .setGraphOptions(GraphOptions.builder().setEnableVisionModality(true).build())
@@ -149,7 +154,10 @@ class MediaPipeVlmEngine
         private fun preferredBackend(): Backend = Backend.GPU
 
         private fun loadPromptTemplate(): String =
-            context.assets.open(PROMPT_ASSET_PATH).bufferedReader().use { it.readText() }
+            context.assets
+                .open(PROMPT_ASSET_PATH)
+                .bufferedReader()
+                .use { it.readText() }
 
         /**
          * Which delegate the last successfully created session actually

@@ -16,7 +16,10 @@ object ColorExtractor {
      * A cluster's centroid color, packed as `0xRRGGBB`, and the fraction of
      * input pixels assigned to it (0.0..1.0), sorted by [share] descending.
      */
-    data class ColorCluster(val rgb: Int, val share: Double)
+    data class ColorCluster(
+        val rgb: Int,
+        val share: Double,
+    )
 
     /**
      * Runs k-means over [pixels] (each an `Int` packed as `0xRRGGBB`, alpha

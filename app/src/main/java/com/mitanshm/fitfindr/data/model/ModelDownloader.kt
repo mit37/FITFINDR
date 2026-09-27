@@ -41,12 +41,12 @@ class ModelDownloader
             val request =
                 OneTimeWorkRequestBuilder<ModelDownloadWorker>()
                     .setConstraints(
-                        Constraints.Builder()
+                        Constraints
+                            .Builder()
                             .setRequiredNetworkType(NetworkType.UNMETERED)
                             .setRequiresStorageNotLow(true)
                             .build(),
-                    )
-                    .build()
+                    ).build()
             workManager.enqueueUniqueWork(ModelDownloadWorker.WORK_NAME, ExistingWorkPolicy.KEEP, request)
         }
 
@@ -88,9 +88,14 @@ sealed interface ModelDownloadState {
 
     data object Queued : ModelDownloadState
 
-    data class InProgress(val downloadedBytes: Long, val totalBytes: Long) : ModelDownloadState
+    data class InProgress(
+        val downloadedBytes: Long,
+        val totalBytes: Long,
+    ) : ModelDownloadState
 
     data object Complete : ModelDownloadState
 
-    data class Failed(val message: String) : ModelDownloadState
+    data class Failed(
+        val message: String,
+    ) : ModelDownloadState
 }
