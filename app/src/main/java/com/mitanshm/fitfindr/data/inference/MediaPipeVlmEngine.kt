@@ -43,13 +43,21 @@ import javax.inject.Singleton
  * GitHub Actions CI's first real `compileDebugKotlin` run failed with
  * "Cannot access class ... MPImage. Check your module classpath", proving
  * the dependency really was missing, not a network fluke. `tasks-vision`
- * was added to `app/build.gradle.kts` pinned to the same version string as
- * `tasks-genai` (`0.10.24`) -- MediaPipe's task artifacts are released in
- * lockstep, but this exact version pairing is NOT independently confirmed,
- * since Google's Maven repository (which serves both artifacts) is
- * unreachable from this sandbox; only GitHub Actions' runners can resolve
- * it. If this specific pairing turns out not to exist, the next CI run's
- * dependency-resolution error will say so and it needs adjusting then.
+ * was added to `app/build.gradle.kts`. The first attempt pinned it to the
+ * same version string as `tasks-genai` (`0.10.24`), guessing MediaPipe
+ * releases its task artifacts in lockstep -- CI's next real run proved
+ * that guess wrong: "Could not find com.google.mediapipe:tasks-vision:
+ * 0.10.24" (dependency resolution, not compilation). Confirmed via public
+ * GitHub issues (google-ai-edge/mediapipe#5588, #6047) that MediaPipe's
+ * per-artifact Maven releases are known to be inconsistent -- e.g.
+ * `tasks-vision` 0.10.26/0.10.26.1 were published while `tasks-genai`
+ * 0.10.26 was not. `tasks-vision` is now pinned to `0.10.26.1`, the
+ * nearest version above `0.10.24` independently confirmed to exist (via
+ * web search, since Google's Maven repository -- which would let this be
+ * checked directly -- is unreachable from this sandbox; only GitHub
+ * Actions' runners can resolve it). `MPImage`/`BitmapImageBuilder` are
+ * basic, long-stable APIs, so a version this close should carry them
+ * unchanged, but that is still an inference, not a confirmed fact.
  *
  * Beyond that, it remains entirely plausible other method names,
  * `GraphOptions` fields, or delegate fallback behavior have drifted from

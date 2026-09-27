@@ -259,16 +259,26 @@ the single most important honesty point in this session's work.
   reading MediaPipe's own `LlmInferenceSession.java` source (its
   `addImage(MPImage image)` signature) that `MPImage`/`BitmapImageBuilder`
   live in the `com.google.mediapipe:tasks-vision` artifact, not
-  `tasks-genai` — added that dependency to `app/build.gradle.kts`, pinned
-  to the same version string as `tasks-genai` (MediaPipe releases its task
-  artifacts in lockstep) since Google's Maven repo — which serves both
-  artifacts and is what would confirm that exact pairing resolves — is
-  itself unreachable from this sandbox; only GitHub Actions' runners can
-  actually resolve it. The same CI run also failed on Material 3's
-  `ExperimentalMaterial3Api` opt-in being a compile *error* rather than a
-  warning without a module-wide opt-in flag; added
+  `tasks-genai` — added that dependency to `app/build.gradle.kts`. The
+  first attempt pinned it to the same version string as `tasks-genai`
+  (`0.10.24`), guessing MediaPipe releases its task artifacts in lockstep.
+  **That guess was wrong** — the very next real CI run failed differently:
+  not a compile error this time, but dependency *resolution*: `Could not
+  find com.google.mediapipe:tasks-vision:0.10.24`. Confirmed via public
+  GitHub issues (google-ai-edge/mediapipe#5588, #6047) that MediaPipe's
+  per-artifact Maven releases are known to be inconsistent — e.g.
+  `tasks-vision` 0.10.26/0.10.26.1 were published on Maven while
+  `tasks-genai` 0.10.26 was not. Re-pinned `tasks-vision` to `0.10.26.1`,
+  the nearest version above `0.10.24` independently confirmed (via web
+  search) to actually exist — Google's Maven repo, which would let this be
+  checked directly, is itself unreachable from this sandbox; only GitHub
+  Actions' runners can actually resolve it. This is a documented inference
+  (basic, long-stable APIs on a nearby version), not a confirmed fact.
+  The same CI run also failed on Material 3's `ExperimentalMaterial3Api`
+  opt-in being a compile *error* rather than a warning without a
+  module-wide opt-in flag; added
   `-opt-in=androidx.compose.material3.ExperimentalMaterial3Api` to
-  `app/build.gradle.kts`'s `kotlinOptions`. Both fixes are real,
+  `app/build.gradle.kts`'s `kotlinOptions`. All fixes are real,
   ktlint/detekt-clean, and pushed — but like everything else in this
   milestone, **not yet confirmed to make `compileDebugKotlin` succeed**
   until the next CI run reports back; see this repo's Actions tab for the
