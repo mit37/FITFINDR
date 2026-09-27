@@ -243,15 +243,36 @@ the single most important honesty point in this session's work.
   `ModelDownloader`'s app-private file, GPU-preferred/CPU-fallback delegate
   selection (try GPU, catch `IllegalStateException`, retry CPU), an
   `activeBackendLabel()` for the Settings screen.
-- **This class has never been run.** No Android SDK, device, emulator, or
-  NPU/GPU delegate exists in this container (confirmed again this session
-  — same as milestone 1-3's finding), and the network host that would
-  serve a real `.task` model bundle is also unreachable here. It is
-  entirely plausible the exact MediaPipe method/class names or delegate
-  fallback behavior have drifted from what's written by the time someone
-  with real hardware verifies it — the file's own doc comment says so
-  explicitly, and flags one particularly uncertain import
-  (`BitmapImageBuilder`'s artifact).
+- **This class has never run on a device.** No Android SDK, device,
+  emulator, or NPU/GPU delegate exists in this container, and the network
+  host that would serve a real `.task` model bundle is also unreachable
+  here. It is entirely plausible the exact MediaPipe method/class names or
+  delegate fallback behavior have drifted from what's written by the time
+  someone with real hardware verifies it — the file's own doc comment says
+  so explicitly.
+- **Update (real CI feedback, same session):** once GitHub Actions CI got
+  far enough to actually run `compileDebugKotlin` for the first time (after
+  fixing the broken `android-actions/setup-android` step and every ktlint/
+  detekt violation blocking it), it failed for real on the exact gap this
+  file had already flagged as "particularly uncertain": `Cannot access
+  class 'com.google.mediapipe.framework.image.MPImage'`. Confirmed by
+  reading MediaPipe's own `LlmInferenceSession.java` source (its
+  `addImage(MPImage image)` signature) that `MPImage`/`BitmapImageBuilder`
+  live in the `com.google.mediapipe:tasks-vision` artifact, not
+  `tasks-genai` — added that dependency to `app/build.gradle.kts`, pinned
+  to the same version string as `tasks-genai` (MediaPipe releases its task
+  artifacts in lockstep) since Google's Maven repo — which serves both
+  artifacts and is what would confirm that exact pairing resolves — is
+  itself unreachable from this sandbox; only GitHub Actions' runners can
+  actually resolve it. The same CI run also failed on Material 3's
+  `ExperimentalMaterial3Api` opt-in being a compile *error* rather than a
+  warning without a module-wide opt-in flag; added
+  `-opt-in=androidx.compose.material3.ExperimentalMaterial3Api` to
+  `app/build.gradle.kts`'s `kotlinOptions`. Both fixes are real,
+  ktlint/detekt-clean, and pushed — but like everything else in this
+  milestone, **not yet confirmed to make `compileDebugKotlin` succeed**
+  until the next CI run reports back; see this repo's Actions tab for the
+  current state, which is more current than this file between sessions.
 - `di/InferenceModule.kt` **still binds `FakeVlmEngine`**, not
   `MediaPipeVlmEngine` — deliberately, since `FakeVlmEngine` is the only
   path any session has actually been able to reason about end-to-end. The

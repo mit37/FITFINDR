@@ -64,6 +64,12 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
+        // TopAppBar and other Material 3 components CaptureScreen/HistoryScreen/
+        // ResultScreen/SettingsScreen use are still behind this opt-in marker in
+        // the Compose BOM version pinned in gradle/libs.versions.toml. Without it,
+        // Kotlin treats each use as a compile ERROR, not a warning (confirmed by
+        // GitHub Actions CI's first real compileDebugKotlin run).
+        freeCompilerArgs += "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api"
     }
 
     buildFeatures {
@@ -133,6 +139,11 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.mediapipe.tasks.genai)
+    // MPImage/BitmapImageBuilder (used by MediaPipeVlmEngine.describe() to feed an
+    // image into LlmInferenceSession.addImage) live in tasks-vision, not tasks-genai --
+    // see that class's doc comment for how this was confirmed after CI's first real
+    // compileDebugKotlin run failed with "Cannot access class ... MPImage".
+    implementation(libs.mediapipe.tasks.vision)
 
     testImplementation(libs.junit5.jupiter.api)
     testRuntimeOnly(libs.junit5.jupiter.engine)

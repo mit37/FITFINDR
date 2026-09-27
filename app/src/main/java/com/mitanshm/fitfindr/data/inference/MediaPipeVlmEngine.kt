@@ -2,6 +2,7 @@ package com.mitanshm.fitfindr.data.inference
 
 import android.content.Context
 import android.graphics.BitmapFactory
+import com.google.mediapipe.framework.image.BitmapImageBuilder
 import com.google.mediapipe.tasks.genai.llminference.GraphOptions
 import com.google.mediapipe.tasks.genai.llminference.LlmInference
 import com.google.mediapipe.tasks.genai.llminference.LlmInference.Backend
@@ -23,20 +24,38 @@ import javax.inject.Singleton
  * ############################################################################
  * # HONESTY (see docs/PLAN.md -- read this before trusting anything below) #
  * ############################################################################
- * This class has **never been run**. This development container has no
- * Android SDK, no emulator, no physical device, and no NPU/GPU delegate to
- * test against (see docs/PLAN.md, "Cloud-instance constraints" -- confirmed
- * with `which sdkmanager`/`adb`, `$ANDROID_HOME`), and even the network
- * host that would serve a real `.task` model bundle is unreachable here.
- * It is written directly against the documented `com.google.mediapipe:
+ * This class has **never run on a device**. This development container has
+ * no Android SDK, no emulator, no physical device, and no NPU/GPU delegate
+ * to test against (see docs/PLAN.md, "Cloud-instance constraints" --
+ * confirmed with `which sdkmanager`/`adb`, `$ANDROID_HOME`), and even the
+ * network host that would serve a real `.task` model bundle is unreachable
+ * here. It is written against the documented `com.google.mediapipe:
  * tasks-genai` `LlmInference`/`LlmInferenceSession`/`GraphOptions` API
  * surface (delegate selection via `Backend.GPU`/`Backend.CPU`, session
  * creation, `generateResponse`) as of the version pinned in
- * `gradle/libs.versions.toml`, and reviewed by eye only. It is entirely
- * plausible the exact method names, `GraphOptions` fields, or delegate
- * fallback behavior have drifted from what is written here by the time
- * this actually runs on a device -- that is precisely why this cannot be
- * marked "done" (see docs/PLAN.md's milestone-honesty section).
+ * `gradle/libs.versions.toml`.
+ *
+ * One concrete gap this dishonesty note used to flag has since been fixed
+ * for real: `addImage`'s `BitmapImageBuilder`/`MPImage` types live in the
+ * `com.google.mediapipe:tasks-vision` artifact, not `tasks-genai` --
+ * confirmed by reading MediaPipe's own `LlmInferenceSession.java` source
+ * (its `addImage(MPImage image)` signature and `MPImage` import) after
+ * GitHub Actions CI's first real `compileDebugKotlin` run failed with
+ * "Cannot access class ... MPImage. Check your module classpath", proving
+ * the dependency really was missing, not a network fluke. `tasks-vision`
+ * was added to `app/build.gradle.kts` pinned to the same version string as
+ * `tasks-genai` (`0.10.24`) -- MediaPipe's task artifacts are released in
+ * lockstep, but this exact version pairing is NOT independently confirmed,
+ * since Google's Maven repository (which serves both artifacts) is
+ * unreachable from this sandbox; only GitHub Actions' runners can resolve
+ * it. If this specific pairing turns out not to exist, the next CI run's
+ * dependency-resolution error will say so and it needs adjusting then.
+ *
+ * Beyond that, it remains entirely plausible other method names,
+ * `GraphOptions` fields, or delegate fallback behavior have drifted from
+ * what is written here by the time this actually runs against real
+ * hardware -- that is still why this cannot be marked "done" (see
+ * docs/PLAN.md's milestone-honesty section).
  *
  * It is NOT the DI-bound [VlmEngine] by default -- `InferenceModule` binds
  * [FakeVlmEngine], which IS exercised by the UI and tests. Switching to
@@ -71,16 +90,7 @@ class MediaPipeVlmEngine
                     }
 
                 session.addQueryChunk(loadPromptTemplate())
-                // NOTE (honesty): `BitmapImageBuilder`/`MPImage` live in MediaPipe's
-                // vision framework artifact, which `tasks-genai` may or may not
-                // transitively pull in depending on the pinned version -- this
-                // import path is the best documentation-based guess, not a
-                // verified-working one. See this file's class doc.
-                session.addImage(
-                    com.google.mediapipe.framework.image
-                        .BitmapImageBuilder(bitmap)
-                        .build(),
-                )
+                session.addImage(BitmapImageBuilder(bitmap).build())
                 session.generateResponse()
             }
 
