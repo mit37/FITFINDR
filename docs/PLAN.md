@@ -278,11 +278,21 @@ the single most important honesty point in this session's work.
   opt-in being a compile *error* rather than a warning without a
   module-wide opt-in flag; added
   `-opt-in=androidx.compose.material3.ExperimentalMaterial3Api` to
-  `app/build.gradle.kts`'s `kotlinOptions`. All fixes are real,
-  ktlint/detekt-clean, and pushed — but like everything else in this
-  milestone, **not yet confirmed to make `compileDebugKotlin` succeed**
-  until the next CI run reports back; see this repo's Actions tab for the
-  current state, which is more current than this file between sessions.
+  `app/build.gradle.kts`'s `kotlinOptions`.
+- **Update:** with the version fix above, `tasks-vision` resolved and
+  `compileDebugKotlin`/`compileReleaseKotlin`/`compileDebugJavaWithJavac`
+  all genuinely succeeded in CI for the first time — real confirmation
+  this file's earlier "documented inference" about the version pairing
+  held. The next real failure was a Hilt/Dagger one:
+  `[Dagger/MissingBinding] ResultParserContract cannot be provided`, from
+  `hiltJavaCompileDebug`. Root cause: `DescribeOutfitUseCase`'s
+  `resultParser` constructor parameter has a Kotlin default value
+  (`ResultParser.asContract()`), but Dagger's generated `@Inject`
+  constructor code resolves every parameter from the dependency graph
+  regardless of Kotlin defaults — a real gap in `InferenceModule`, not
+  something only a device could have caught. Fixed with a `@Provides`
+  method in `InferenceModule`'s companion object returning the same value
+  the default would have. ktlint/detekt still clean after the fix.
 - `di/InferenceModule.kt` **still binds `FakeVlmEngine`**, not
   `MediaPipeVlmEngine` — deliberately, since `FakeVlmEngine` is the only
   path any session has actually been able to reason about end-to-end. The

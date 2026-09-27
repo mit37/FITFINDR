@@ -3,8 +3,12 @@ package com.mitanshm.fitfindr.di
 import com.mitanshm.fitfindr.data.inference.FakeVlmEngine
 import com.mitanshm.fitfindr.data.inference.MediaPipeVlmEngine
 import com.mitanshm.fitfindr.data.inference.VlmEngine
+import com.mitanshm.fitfindr.domain.ResultParser
+import com.mitanshm.fitfindr.domain.ResultParserContract
+import com.mitanshm.fitfindr.domain.asContract
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 
@@ -39,4 +43,19 @@ import dagger.hilt.components.SingletonComponent
 abstract class InferenceModule {
     @Binds
     abstract fun bindVlmEngine(fake: FakeVlmEngine): VlmEngine
+
+    companion object {
+        /**
+         * [DescribeOutfitUseCase][com.mitanshm.fitfindr.domain.DescribeOutfitUseCase]'s
+         * `resultParser` constructor parameter has a Kotlin default value
+         * ([ResultParser.asContract]), but Hilt's generated `@Inject`
+         * constructor code always resolves every parameter from the
+         * dependency graph regardless of Kotlin defaults -- confirmed by
+         * GitHub Actions CI's first real `hiltJavaCompileDebug` run failing
+         * with `[Dagger/MissingBinding] ResultParserContract cannot be
+         * provided`. This provides the same value the default would have.
+         */
+        @Provides
+        fun provideResultParserContract(): ResultParserContract = ResultParser.asContract()
+    }
 }

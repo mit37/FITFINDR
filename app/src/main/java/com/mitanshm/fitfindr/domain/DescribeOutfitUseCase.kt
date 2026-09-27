@@ -28,4 +28,4 @@ fun interface ResultParserContract {
     fun parse(rawText: String): Result<OutfitResult>
 }
 
-private fun ResultParser.asContract(): ResultParserContract = ResultParserContract { text -> this.parse(text) }
+internal fun ResultParser.asContract(): ResultParserContract = ResultParserContract { text -> this.parse(text) }
