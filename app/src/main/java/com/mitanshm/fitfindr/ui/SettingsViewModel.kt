@@ -41,7 +41,7 @@ class SettingsViewModel
          * report yet. This always returns the fixed string below rather
          * than fabricating a CPU/GPU/NPU value nobody has observed.
          */
-        fun activeAcceleratorLabel(): String = "Not applicable — running against FakeVlmEngine (see docs/PLAN.md)"
+        val activeAcceleratorLabel: String = "Not applicable — running against FakeVlmEngine (see docs/PLAN.md)"
 
         private companion object {
             const val STOP_TIMEOUT_MS = 5_000L

@@ -68,7 +68,7 @@ fun SettingsScreen(
             HorizontalDivider()
 
             Text("Active accelerator", style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
-            Text(viewModel.activeAcceleratorLabel())
+            Text(viewModel.activeAcceleratorLabel)
 
             HorizontalDivider()
 

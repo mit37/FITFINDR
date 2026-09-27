@@ -94,18 +94,26 @@ class ModelDownloadWorker
 
             connection.inputStream.use { input ->
                 java.io.FileOutputStream(partialFile, append).use { output ->
-                    val buffer = ByteArray(DOWNLOAD_BUFFER_SIZE)
-                    var totalWritten = if (append) startOffset else 0L
-                    while (true) {
-                        val read = input.read(buffer)
-                        if (read < 0) break
-                        output.write(buffer, 0, read)
-                        totalWritten += read
-                        setProgressAsync(buildProgressData(totalWritten, ModelConfig.APPROX_SIZE_BYTES))
-                    }
+                    copyWithProgress(input, output, initialWritten = if (append) startOffset else 0L)
                 }
             }
             connection.disconnect()
+        }
+
+        private fun copyWithProgress(
+            input: java.io.InputStream,
+            output: java.io.OutputStream,
+            initialWritten: Long,
+        ) {
+            val buffer = ByteArray(DOWNLOAD_BUFFER_SIZE)
+            var totalWritten = initialWritten
+            var read = input.read(buffer)
+            while (read >= 0) {
+                output.write(buffer, 0, read)
+                totalWritten += read
+                setProgressAsync(buildProgressData(totalWritten, ModelConfig.APPROX_SIZE_BYTES))
+                read = input.read(buffer)
+            }
         }
 
         private fun buildProgressData(

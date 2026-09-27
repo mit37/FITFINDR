@@ -16,6 +16,13 @@ style:
     active: false
   ReturnCount:
     active: false
+  MaxLineLength:
+    maxLineLength: 140
 
 naming:
   active: true
+  FunctionNaming:
+    # Jetpack Compose functions are conventionally PascalCase (they read as
+    # implicit UI components); see .editorconfig's matching ktlint
+    # exception for the same rationale.
+    ignoreAnnotated: ["Composable"]
