@@ -12,7 +12,6 @@ package com.mitanshm.fitfindr.data.model
  * in `docs/PLAN.md`.
  */
 object DownloadPlanner {
-
     /**
      * @param existingPartialBytes bytes already present in the `.partial`
      *   file on disk (0 if none exists yet).

@@ -11,7 +11,6 @@ import java.nio.file.Path
 import kotlin.io.path.writeBytes
 
 class ChecksumVerifierTest {
-
     // Known value: SHA-256 of the empty byte string (computed independently with
     // `python3 -c "import hashlib; print(hashlib.sha256(b'').hexdigest())"`).
     private val emptyInputSha256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"

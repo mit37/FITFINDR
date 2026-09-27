@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 class ColorExtractorTest {
-
     private val red = 0xFF0000
     private val blue = 0x0000FF
     private val green = 0x00FF00

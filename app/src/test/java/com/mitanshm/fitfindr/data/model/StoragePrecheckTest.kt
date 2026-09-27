@@ -8,7 +8,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 class StoragePrecheckTest {
-
     @Test
     @DisplayName("enough space including margin returns true")
     fun `sufficient space`() {

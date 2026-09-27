@@ -24,7 +24,6 @@ import java.io.FileOutputStream
  * `FileProvider`) and has NOT been run on a device -- see docs/PLAN.md.
  */
 object ShareImage {
-
     fun render(outfit: OutfitResult): Bitmap {
         val width = CARD_WIDTH_PX
         val lineHeight = 44

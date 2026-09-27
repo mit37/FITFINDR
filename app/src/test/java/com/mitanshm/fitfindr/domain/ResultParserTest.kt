@@ -7,7 +7,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 class ResultParserTest {
-
     private fun fixture(name: String): String =
         checkNotNull(javaClass.classLoader.getResourceAsStream("fixtures/$name")) {
             "Missing test fixture: $name"

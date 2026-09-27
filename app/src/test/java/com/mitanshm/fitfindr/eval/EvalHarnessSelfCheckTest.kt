@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test
  * section reports, labeled as such.
  */
 class EvalHarnessSelfCheckTest {
-
     @Test
     @DisplayName("json validity self-check over the existing golden fixtures matches eval/results.json's harness_self_check numbers")
     fun `json validity self check`() {

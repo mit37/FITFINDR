@@ -14,7 +14,6 @@ import com.mitanshm.fitfindr.domain.ResultParser
  *    NOT representative of real model performance (see docs/PLAN.md).
  */
 object EvalMetrics {
-
     data class ParseValidity(
         val totalCases: Int,
         val strictValidCount: Int,

@@ -16,7 +16,6 @@ import com.mitanshm.fitfindr.domain.OutfitResult
  * cannot reach).
  */
 object OutfitMapper {
-
     /** Separator used to flatten a garment's search-query list into one Room column. Chosen to be
      * vanishingly unlikely to appear inside a real search-query phrase. */
     const val QUERY_SEPARATOR = "\u001F" // ASCII unit separator

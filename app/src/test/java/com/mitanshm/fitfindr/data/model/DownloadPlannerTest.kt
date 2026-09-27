@@ -7,7 +7,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 class DownloadPlannerTest {
-
     @Test
     @DisplayName("no existing partial file starts a fresh download for the full size")
     fun `no partial file starts fresh`() {

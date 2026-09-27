@@ -21,7 +21,6 @@ import kotlinx.serialization.json.Json
  * model itself failed to fill a field.
  */
 object ResultParser {
-
     private val strictJson = Json {
         ignoreUnknownKeys = true
         isLenient = false

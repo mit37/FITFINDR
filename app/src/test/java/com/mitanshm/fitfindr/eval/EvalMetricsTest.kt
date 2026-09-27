@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 class EvalMetricsTest {
-
     @Test
     @DisplayName("jsonValidity counts strict and post-repair successes independently")
     fun `json validity counts independently`() {

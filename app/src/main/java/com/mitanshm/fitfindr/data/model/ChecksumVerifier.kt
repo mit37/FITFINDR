@@ -16,7 +16,6 @@ import java.security.MessageDigest
  * `docs/PLAN.md`.
  */
 object ChecksumVerifier {
-
     /** Streams [input] through SHA-256 in fixed-size chunks and returns the lowercase hex digest. */
     fun sha256(input: InputStream, bufferSize: Int = DEFAULT_BUFFER_SIZE): String {
         val digest = MessageDigest.getInstance("SHA-256")

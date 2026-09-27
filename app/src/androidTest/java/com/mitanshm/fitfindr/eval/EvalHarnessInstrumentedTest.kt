@@ -37,7 +37,6 @@ import java.io.File
  */
 @RunWith(AndroidJUnit4::class)
 class EvalHarnessInstrumentedTest {
-
     @Test
     fun runEvalHarnessAgainstLabeledPhotos() =
         runBlocking {

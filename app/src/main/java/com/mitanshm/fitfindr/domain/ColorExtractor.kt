@@ -12,7 +12,6 @@ import kotlin.random.Random
  * `0xRRGGBB` pixels this class consumes.
  */
 object ColorExtractor {
-
     /**
      * A cluster's centroid color, packed as `0xRRGGBB`, and the fraction of
      * input pixels assigned to it (0.0..1.0), sorted by [share] descending.

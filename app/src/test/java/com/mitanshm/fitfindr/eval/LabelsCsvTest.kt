@@ -7,7 +7,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 class LabelsCsvTest {
-
     @Test
     @DisplayName("a header-only CSV (the committed eval/labels.csv, no photos supplied yet) parses to an empty list")
     fun `header only csv parses empty`() {

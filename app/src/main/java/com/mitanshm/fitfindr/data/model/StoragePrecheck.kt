@@ -12,7 +12,6 @@ package com.mitanshm.fitfindr.data.model
  * plain number.
  */
 object StoragePrecheck {
-
     /**
      * Extra headroom required on top of the download's remaining byte
      * count, so the device isn't left with zero free space (which causes
